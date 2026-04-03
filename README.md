@@ -17,7 +17,7 @@ A UserScript that adds clickable page number navigation to GitHub Stars pages
 ## Installation
 
 1. Install [Tampermonkey](https://www.tampermonkey.net/) or [Violentmonkey](https://violentmonkey.github.io/)
-2. Install the script: [github-stars-pagination.user.js](github-stars-pagination.user.js)
+2. Install the script: [github-stars-pagination.user.js](https://github.com/dyxang/github-stars-pagination/raw/refs/heads/main/github-stars-pagination.user.js)
 3. Go to any GitHub stars page (e.g., `https://github.com/your-username?tab=stars`)
 
 ## How It Works
@@ -59,7 +59,7 @@ If pagination doesn't appear:
 为 GitHub 标星页面添加可点击页码导航的用户脚本
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-14.0.0-blue.svg)](https://github.com/)
+[![Version](https://img.shields.io/badge/version-0.4.3-blue.svg)](https://github.com/)
 
 [English](#github-stars-pagination)
 
@@ -73,7 +73,7 @@ If pagination doesn't appear:
 ## 安装
 
 1. 安装 [Tampermonkey](https://www.tampermonkey.net/) 或 [Violentmonkey](https://violentmonkey.github.io/)
-2. 安装脚本：[github-stars-pagination.user.js](github-stars-pagination.user.js)
+2. 安装脚本：[github-stars-pagination.user.js](https://github.com/dyxang/github-stars-pagination/raw/refs/heads/main/github-stars-pagination.user.js)
 3. 打开任何 GitHub 标星页面（例如：`https://github.com/your-username?tab=stars`）
 
 
