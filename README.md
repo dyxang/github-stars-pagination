@@ -3,7 +3,7 @@
 A UserScript that adds clickable page number navigation to GitHub Stars pages
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-14.0.0-blue.svg)](https://github.com/)
+[![Version](https://img.shields.io/badge/version-0.4.3-blue.svg)](https://github.com/)
 
 [中文](#github-标星分页导航)
 
