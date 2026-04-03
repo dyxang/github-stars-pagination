@@ -16,8 +16,113 @@
 (function() {
     'use strict';
     
+    // 公共工具函数
+    const utils = {
+        // 安全的localStorage操作
+        safeLocalStorage: {
+            get: (key) => {
+                try {
+                    return localStorage.getItem(key);
+                } catch (e) {
+                    console.error('❌ Error getting from localStorage:', e);
+                    return null;
+                }
+            },
+            set: (key, value) => {
+                try {
+                    localStorage.setItem(key, value);
+                } catch (e) {
+                    console.error('❌ Error setting to localStorage:', e);
+                }
+            },
+            remove: (key) => {
+                try {
+                    localStorage.removeItem(key);
+                } catch (e) {
+                    console.error('❌ Error removing from localStorage:', e);
+                }
+            }
+        },
+        
+        // 安全的sessionStorage操作
+        safeSessionStorage: {
+            get: (key) => {
+                try {
+                    return sessionStorage.getItem(key);
+                } catch (e) {
+                    console.error('❌ Error getting from sessionStorage:', e);
+                    return null;
+                }
+            },
+            set: (key, value) => {
+                try {
+                    sessionStorage.setItem(key, value);
+                } catch (e) {
+                    console.error('❌ Error setting to sessionStorage:', e);
+                }
+            },
+            remove: (key) => {
+                try {
+                    sessionStorage.removeItem(key);
+                } catch (e) {
+                    console.error('❌ Error removing from sessionStorage:', e);
+                }
+            }
+        },
+        
+        // 查找DOM元素
+        findElement: (selector, container = document) => {
+            try {
+                return container.querySelector(selector);
+            } catch (e) {
+                console.error('❌ Error finding element:', e);
+                return null;
+            }
+        },
+        
+        // 查找多个DOM元素
+        findElements: (selector, container = document) => {
+            try {
+                return Array.from(container.querySelectorAll(selector));
+            } catch (e) {
+                console.error('❌ Error finding elements:', e);
+                return [];
+            }
+        },
+        
+        // 查找包含特定文本的元素
+        findElementByText: (text, tags = ['button', 'a'], container = document) => {
+            try {
+                return utils.findElements(tags.join(','), container).find(el => 
+                    el.textContent.trim() === text
+                );
+            } catch (e) {
+                console.error('❌ Error finding element by text:', e);
+                return null;
+            }
+        },
+        
+        // 安全的URL解析
+        extractParamFromUrl: (url, param) => {
+            try {
+                const urlObj = new URL(url);
+                return urlObj.searchParams.get(param);
+            } catch (e) {
+                return null;
+            }
+        },
+        
+        // 错误处理包装函数
+        safe: (fn, fallback = null) => {
+            try {
+                return fn();
+            } catch (e) {
+                console.error('❌ Error in safe function:', e);
+                return fallback;
+            }
+        }
+    };
 
-    
     let retryCount = 0;
     const MAX_RETRIES = 15;
     const RETRY_INTERVAL = 500;
@@ -50,14 +155,9 @@
 
     
     function clearCache() {
-        try {
-            localStorage.removeItem(getCacheKey());
-            localStorage.removeItem(getCacheKey() + '_timestamp');
-            pages = {};
-
-        } catch (e) {
-            console.error('❌ Error clearing cache:', e);
-        }
+        utils.safeLocalStorage.remove(getCacheKey());
+        utils.safeLocalStorage.remove(getCacheKey() + '_timestamp');
+        pages = {};
     }
     
     function getCacheTimestampKey() {
@@ -65,8 +165,8 @@
     }
     
     function isCacheExpired() {
-        try {
-            const timestamp = localStorage.getItem(getCacheTimestampKey());
+        return utils.safe(() => {
+            const timestamp = utils.safeLocalStorage.get(getCacheTimestampKey());
             if (!timestamp) return true;
             
             const now = Date.now();
@@ -76,86 +176,59 @@
             const CACHE_EXPIRY = 24 * HOUR; // 24小时缓存过期
             
             return cacheAge > CACHE_EXPIRY;
-        } catch (e) {
-            console.error('❌ Error checking cache expiry:', e);
-            return true;
-        }
+        }, true);
     }
     
     function storePages() {
-        try {
-            localStorage.setItem(getCacheKey(), JSON.stringify(pages));
-            localStorage.setItem(getCacheTimestampKey(), Date.now().toString());
-
-        } catch (e) {
-            console.error('❌ Error storing pages:', e);
-        }
+        utils.safeLocalStorage.set(getCacheKey(), JSON.stringify(pages));
+        utils.safeLocalStorage.set(getCacheTimestampKey(), Date.now().toString());
     }
     
     function loadPages() {
-        try {
+        utils.safe(() => {
             if (isCacheExpired()) {
-
                 clearCache();
                 return;
             }
             
-            const stored = localStorage.getItem(getCacheKey());
+            const stored = utils.safeLocalStorage.get(getCacheKey());
             if (stored) {
                 pages = JSON.parse(stored);
-
             }
-        } catch (e) {
-            console.error('❌ Error loading pages:', e);
-            pages = {};
-        }
+        });
+        if (!pages) pages = {};
     }
     
     function clearSession() {
-        try {
-            sessionStorage.removeItem(getSessionKey());
-            currentPage = 1;
-
-        } catch (e) {
-            console.error('❌ Error clearing session:', e);
-        }
+        utils.safeSessionStorage.remove(getSessionKey());
+        currentPage = 1;
     }
     
     function loadCurrentPage() {
-        try {
-            const stored = sessionStorage.getItem(getSessionKey());
+        utils.safe(() => {
+            const stored = utils.safeSessionStorage.get(getSessionKey());
             if (stored) {
                 currentPage = parseInt(stored, 10);
-
             }
-        } catch (e) {
-            console.error('❌ Error loading current page:', e);
-        }
+        });
     }
     
     function storeCurrentPage(page) {
-        try {
-            sessionStorage.setItem(getSessionKey(), page.toString());
-            currentPage = page;
-
-        } catch (e) {
-            console.error('❌ Error storing current page:', e);
-        }
+        utils.safeSessionStorage.set(getSessionKey(), page.toString());
+        currentPage = page;
     }
     
     function getTotalStars() {
-        try {
-            const starsLink = Array.from(document.querySelectorAll('a')).find(a => 
+        return utils.safe(() => {
+            const starsLink = utils.findElements('a').find(a => 
                 a.textContent && a.textContent.includes('Stars') && !a.textContent.includes('Starred')
             );
             
             if (starsLink) {
-
                 const text = starsLink.textContent;
                 const numbers = text.match(/\d+/g);
                 if (numbers && numbers.length > 0) {
                     const totalStars = parseInt(numbers[0].replace(/,/g, ''), 10);
-
                     return totalStars;
                 }
             }
@@ -165,15 +238,11 @@
             if (starMatches && starMatches[1]) {
                 const countStr = starMatches[1].replace(/,/g, '');
                 const totalStars = parseInt(countStr, 10);
-
                 return totalStars;
             }
             
             return null;
-        } catch (e) {
-            console.error('❌ Error getting total stars:', e);
-            return null;
-        }
+        }, null);
     }
     
     function calculateTotalPages(totalStars) {
@@ -184,20 +253,14 @@
     }
     
     function findPaginationContainer() {
-        try {
-            const previousBtn = Array.from(document.querySelectorAll('button, a')).find(el => 
-                el.textContent.trim() === 'Previous'
-            );
-            const nextBtn = Array.from(document.querySelectorAll('button, a')).find(el => 
-                el.textContent.trim() === 'Next'
-            );
-            
-
+        return utils.safe(() => {
+            const previousBtn = utils.findElementByText('Previous');
+            const nextBtn = utils.findElementByText('Next');
             
             if (previousBtn) {
                 let parent = previousBtn.parentElement;
                 for (let i = 0; i < 5 && parent; i++) {
-                    if (parent.querySelector('button') || parent.querySelector('a')) {
+                    if (utils.findElement('button, a', parent)) {
                         return parent;
                     }
                     parent = parent.parentElement;
@@ -206,7 +269,7 @@
             } else if (nextBtn) {
                 let parent = nextBtn.parentElement;
                 for (let i = 0; i < 5 && parent; i++) {
-                    if (parent.querySelector('button') || parent.querySelector('a')) {
+                    if (utils.findElement('button, a', parent)) {
                         return parent;
                     }
                     parent = parent.parentElement;
@@ -215,10 +278,7 @@
             }
             
             return null;
-        } catch (e) {
-            console.error('❌ Error finding pagination container:', e);
-            return null;
-        }
+        }, null);
     }
     
     function getCurrentPage() {
@@ -226,12 +286,7 @@
     }
     
     function extractAfterFromUrl(url) {
-        try {
-            const urlObj = new URL(url);
-            return urlObj.searchParams.get('after');
-        } catch (e) {
-            return null;
-        }
+        return utils.extractParamFromUrl(url, 'after');
     }
     
     async function preloadPages() {
@@ -275,9 +330,7 @@
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(html, 'text/html');
                     
-                    const nextBtn = Array.from(doc.querySelectorAll('button, a')).find(el => 
-                        el.textContent.trim() === 'Next'
-                    );
+                    const nextBtn = utils.findElementByText('Next', ['button', 'a'], doc);
                     
                     if (!nextBtn) {
 
@@ -524,71 +577,50 @@
     }
     
     async function insertPageInfo() {
-        try {
-
-            
+        return utils.safe(() => {
             loadPages();
             loadCurrentPage();
             
             const paginationContainer = findPaginationContainer();
             if (!paginationContainer) {
-
                 return false;
             }
             
-
-            
-            const existingInfo = document.querySelector('.custom-stars-page-info');
+            const existingInfo = utils.findElement('.custom-stars-page-info');
             if (existingInfo) {
-
                 existingInfo.remove();
             }
             
             const currentPage = getCurrentPage();
-
-            
             const totalStars = getTotalStars();
             const totalPages = totalStars ? calculateTotalPages(totalStars) : 0;
-
             
             const pageInfo = createPageInfo(totalStars, totalPages, currentPage);
             pageInfo.className = 'custom-stars-page-info';
             
-            const previousBtn = Array.from(paginationContainer.children).find(el => 
+            const previousBtn = utils.findElements('*', paginationContainer).find(el => 
                 el.textContent.trim() === 'Previous'
             );
-            const nextBtn = Array.from(paginationContainer.children).find(el => 
+            const nextBtn = utils.findElements('*', paginationContainer).find(el => 
                 el.textContent.trim() === 'Next'
             );
             
-
-            
             if (previousBtn && nextBtn) {
-
                 paginationContainer.insertBefore(pageInfo, nextBtn);
             } else if (nextBtn) {
-
                 paginationContainer.insertBefore(pageInfo, nextBtn);
             } else if (previousBtn) {
-
                 paginationContainer.insertBefore(pageInfo, previousBtn.nextSibling);
             } else {
-
                 paginationContainer.appendChild(pageInfo);
             }
             
-
-            
             if (Object.keys(pages).length < 2 && !isLoading) {
-
                 setTimeout(preloadPages, 1000);
             }
             
             return true;
-        } catch (e) {
-            console.error('❌ Error inserting page info:', e);
-            return false;
-        }
+        }, false);
     }
     
     async function init() {
@@ -624,14 +656,12 @@
     
     function updatePagination() {
         if (isUpdating) {
-
             return;
         }
         
         isUpdating = true;
-
         
-        const existingInfo = document.querySelector('.custom-stars-page-info');
+        const existingInfo = utils.findElement('.custom-stars-page-info');
         if (existingInfo) {
             existingInfo.remove();
         }
@@ -646,19 +676,16 @@
     }
     
     function detectPageChange() {
-        const starsContainer = document.querySelector('[data-testid="stars-list"]') || 
-                             document.querySelector('.js-stars-container') ||
-                             document.querySelector('.col-10');
+        const starsContainer = utils.findElement('[data-testid="stars-list"]') || 
+                             utils.findElement('.js-stars-container') ||
+                             utils.findElement('.col-10');
         
         if (starsContainer) {
             const currentContent = starsContainer.textContent;
             if (currentContent !== lastStarsContent) {
-
                 lastStarsContent = currentContent;
                 
-                const nextBtn = Array.from(document.querySelectorAll('button, a')).find(el => 
-                    el.textContent.trim() === 'Next'
-                );
+                const nextBtn = utils.findElementByText('Next');
                 
                 if (nextBtn) {
                     const after = extractAfterFromUrl(nextBtn.href);
@@ -666,7 +693,6 @@
                         for (let pageNum in pages) {
                             if (pages[pageNum] === after) {
                                 const page = parseInt(pageNum, 10);
-
                                 storeCurrentPage(page);
                                 updatePagination();
                                 return;
@@ -674,7 +700,6 @@
                         }
                     } else {
                         // 如果没有 after 参数，可能是第一页
-
                         storeCurrentPage(1);
                         updatePagination();
                         return;
@@ -685,16 +710,14 @@
     }
     
     function setupNetworkMonitor() {
-        const originalFetch = window.fetch;
-        window.fetch = function(url, options) {
-            // 检查是否是 stars 页面的请求
+        // 统一的网络请求处理函数
+        function handleNetworkRequest(url) {
             if (url.includes('tab=stars') || (typeof url === 'string' && url.includes('/stars'))) {
                 const after = extractAfterFromUrl(url);
                 if (after) {
                     for (let pageNum in pages) {
                         if (pages[pageNum] === after) {
                             const page = parseInt(pageNum, 10);
-
                             storeCurrentPage(page);
                             setTimeout(updatePagination, 300);
                             break;
@@ -702,36 +725,23 @@
                     }
                 } else {
                     // 如果没有 after 参数，可能是第一页
-
                     storeCurrentPage(1);
                     setTimeout(updatePagination, 300);
                 }
             }
+        }
+        
+        // 监听 fetch 请求
+        const originalFetch = window.fetch;
+        window.fetch = function(url, options) {
+            handleNetworkRequest(url);
             return originalFetch.apply(this, arguments);
         };
         
         // 监听 XMLHttpRequest 请求
         const originalXhrOpen = XMLHttpRequest.prototype.open;
         XMLHttpRequest.prototype.open = function(method, url) {
-            if (url.includes('tab=stars') || (typeof url === 'string' && url.includes('/stars'))) {
-                const after = extractAfterFromUrl(url);
-                if (after) {
-                    for (let pageNum in pages) {
-                        if (pages[pageNum] === after) {
-                            const page = parseInt(pageNum, 10);
-
-                            storeCurrentPage(page);
-                            setTimeout(updatePagination, 300);
-                            break;
-                        }
-                    }
-                } else {
-                    // 如果没有 after 参数，可能是第一页
-
-                    storeCurrentPage(1);
-                    setTimeout(updatePagination, 300);
-                }
-            }
+            handleNetworkRequest(url);
             return originalXhrOpen.apply(this, arguments);
         };
     }
@@ -741,12 +751,11 @@
     setTimeout(init, 500);
     
     const observer = new MutationObserver(function(mutations) {
-        try {
-            const existingInfo = document.querySelector('.custom-stars-page-info');
+        utils.safe(() => {
+            const existingInfo = utils.findElement('.custom-stars-page-info');
             if (!existingInfo) {
                 const paginationContainer = findPaginationContainer();
                 if (paginationContainer) {
-
                     retryCount = 0;
                     loadPages();
                     loadCurrentPage();
@@ -755,14 +764,22 @@
             }
             
             detectPageChange();
-        } catch (e) {
-            console.error('❌ Error in MutationObserver:', e);
-        }
+        });
     });
     
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true
+    // 优化：只监听可能包含分页和stars内容的容器
+    const targetContainers = [
+        utils.findElement('.paginate-container'),
+        utils.findElement('.js-stars-container'),
+        utils.findElement('[data-testid="stars-list"]'),
+        document.body // 作为 fallback
+    ].filter(Boolean);
+    
+    targetContainers.forEach(container => {
+        observer.observe(container, {
+            childList: true,
+            subtree: true
+        });
     });
     
     window.addEventListener('popstate', function() {
