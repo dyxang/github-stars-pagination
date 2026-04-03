@@ -1,72 +1,111 @@
-# GitHub Stars Pagination | GitHub 标星分页导航
+# GitHub Stars Pagination
 
-> A UserScript that adds clickable page number navigation to GitHub Stars pages | 一个为 GitHub 标星页面添加可点击页码导航的用户脚本
+A UserScript that adds clickable page number navigation to GitHub Stars pages
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-0.4.3-blue.svg)](https://github.com/)
+[![Version](https://img.shields.io/badge/version-14.0.0-blue.svg)](https://github.com/)
 
-## English | 中文
+[中文](#github-标星分页导航)
 
-### Features | 功能特性
+## Features
 
-- ✨ Adds clickable page number buttons between "Previous" and "Next" buttons | 在 "Previous" 和 "Next" 按钮之间添加可点击的页码按钮
-- 📊 Displays current page and total pages information | 显示当前页和总页数信息
-- 💾 Smart caching with 24-hour expiration | 智能缓存，24小时过期
-- 🔄 Page change detection and automatic update | 页面变化检测和自动更新
-- 🎨 Styled to match GitHub's native UI | 样式与 GitHub 原生 UI 一致
-- ⚡ Preloads pages for faster navigation | 预加载页面以实现更快的导航
-- 🔧 Built-in cache clearing via Tampermonkey menu | 通过 Tampermonkey 菜单内置清除缓存功能
+- Adds clickable page numbers between "Previous" and "Next" buttons
+- Auto-updates navigation when page changes
+- Preloads pages for faster navigation
+- Includes cache clearing in Tampermonkey menu
 
-### Installation | 安装方法
+## Installation
 
-1. Install [Tampermonkey](https://www.tampermonkey.net/) or [Violentmonkey](https://violentmonkey.github.io/) extension for your browser | 为你的浏览器安装 [Tampermonkey](https://www.tampermonkey.net/) 或 [Violentmonkey](https://violentmonkey.github.io/) 扩展
+1. Install [Tampermonkey](https://www.tampermonkey.net/) or [Violentmonkey](https://violentmonkey.github.io/)
+2. Install the script: [github-stars-pagination.user.js](github-stars-pagination.user.js)
+3. Go to any GitHub stars page (e.g., `https://github.com/your-username?tab=stars`)
 
-2. Click here to install the script: [github-stars-pagination.user.js](github-stars-pagination.user.js) | 点击这里安装脚本：[github-stars-pagination.user.js](github-stars-pagination.user.js)
+## How It Works
 
-3. Visit any GitHub user's stars page (e.g., `https://github.com/your-username?tab=stars`) | 访问任何 GitHub 用户的标星页面（例如：`https://github.com/your-username?tab=stars`）
+1. Detects when you're on a GitHub stars page
+2. Finds the pagination container
+3. Preloads page information
+4. Stores data in localStorage for 24 hours
+5. Adds styled page number buttons
+6. Updates navigation when page changes
 
-### Usage | 使用方法
+## Configuration
 
-1. Navigate to any GitHub stars page | 导航到任何 GitHub 标星页面
-2. The script will automatically add page number navigation | 脚本会自动添加页码导航
-3. Click on any page number to jump directly to that page | 点击任何页码直接跳转到该页面
-4. Use Tampermonkey menu to clear cache if needed | 如需要，使用 Tampermonkey 菜单清除缓存
-
-### How It Works | 工作原理
-
-The script works by: | 脚本的工作原理：
-
-1. Detecting the GitHub stars page URL pattern | 检测 GitHub 标星页面的 URL 模式
-2. Finding the pagination container with "Previous" and "Next" buttons | 查找带有 "Previous" 和 "Next" 按钮的分页容器
-3. Preloading page information by fetching subsequent pages | 通过获取后续页面预加载页面信息
-4. Storing page cursors in localStorage for 24 hours | 将页面游标存储在 localStorage 中，有效期 24 小时
-5. Inserting styled page number buttons between navigation buttons | 在导航按钮之间插入样式化的页码按钮
-6. Monitoring page changes and updating navigation accordingly | 监控页面变化并相应更新导航
-
-### Configuration | 配置
-
-The script has several configurable constants at the top: | 脚本顶部有几个可配置的常量：
+Configurable constants at the top of the script:
 
 ```javascript
-const STARS_PER_PAGE = 30;      // Items per page | 每页项目数
-const MAX_PAGES = 15;           // Maximum pages to preload | 最大预加载页数
-const REQUEST_DELAY = 800;      // Delay between requests (ms) | 请求之间的延迟（毫秒）
-const CACHE_EXPIRY = 24 * HOUR; // Cache duration | 缓存持续时间
+const STARS_PER_PAGE = 30;      // Items per page
+const MAX_PAGES = 15;           // Maximum pages to preload
+const REQUEST_DELAY = 800;      // Delay between requests (ms)
+const CACHE_EXPIRY = 24 * HOUR; // Cache duration
 ```
 
-### Troubleshooting | 故障排除
+## Troubleshooting
 
-If the pagination doesn't appear: | 如果分页没有出现：
+If pagination doesn't appear:
+1. Refresh the page
+2. Clear cache via Tampermonkey menu
+3. Ensure you're on a valid stars page (`?tab=stars`)
+4. Check browser console for errors
 
-1. Refresh the page | 刷新页面
-2. Clear the cache via Tampermonkey menu | 通过 Tampermonkey 菜单清除缓存
-3. Make sure you're on a valid stars page URL (`?tab=stars`) | 确保你在有效的标星页面 URL 上（`?tab=stars`）
-4. Check browser console for errors | 检查浏览器控制台是否有错误
+## License
 
-### Contributing | 贡献
+[MIT](LICENSE)
 
-Contributions, issues, and feature requests are welcome! | 欢迎贡献、提交问题和功能请求！
+---
 
-### License | 许可证
+# GitHub 标星分页导航
+
+为 GitHub 标星页面添加可点击页码导航的用户脚本
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/badge/version-14.0.0-blue.svg)](https://github.com/)
+
+[English](#github-stars-pagination)
+
+## 功能
+
+- 在 "Previous" 和 "Next" 按钮之间添加可点击页码
+- 页面变化时自动更新导航
+- 预加载页面以加快导航速度
+- 在 Tampermonkey 菜单中包含清除缓存选项
+
+## 安装
+
+1. 安装 [Tampermonkey](https://www.tampermonkey.net/) 或 [Violentmonkey](https://violentmonkey.github.io/)
+2. 安装脚本：[github-stars-pagination.user.js](github-stars-pagination.user.js)
+3. 打开任何 GitHub 标星页面（例如：`https://github.com/your-username?tab=stars`）
+
+
+## 工作原理
+
+1. 检测你何时访问 GitHub 标星页面
+2. 找到分页容器
+3. 预加载页面信息
+4. 将数据存储在 localStorage 中24小时
+5. 添加样式化的页码按钮
+6. 页面变化时更新导航
+
+## 配置
+
+脚本顶部的可配置常量：
+
+```javascript
+const STARS_PER_PAGE = 30;      // 每页项目数
+const MAX_PAGES = 15;           // 最大预加载页数
+const REQUEST_DELAY = 800;      // 请求之间的延迟（毫秒）
+const CACHE_EXPIRY = 24 * HOUR; // 缓存持续时间
+```
+
+## 故障排除
+
+如果分页没有显示：
+1. 刷新页面
+2. 通过 Tampermonkey 菜单清除缓存
+3. 确保你在有效的标星页面上（`?tab=stars`）
+4. 检查浏览器控制台是否有错误
+
+
+## 许可证
 
 [MIT](LICENSE)
