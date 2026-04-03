@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         GitHub Stars Pagination
 // @name:zh-CN   GitHub Stars 分页导航
-// @namespace    https://github.com/
+// @namespace    https://github.com/dyxang
 // @version      0.4.3
 // @description  Add clickable page number navigation to GitHub Stars pages
 // @description:zh-CN  为 GitHub 标星页面在 Previous 和 Next 按钮之间添加可点击的页码导航
 // @author       GitHub Community
 // @match        https://github.com/*?tab=stars*
+// @updateURL    https://github.com/dyxang/github-stars-pagination/raw/refs/heads/main/github-stars-pagination.user.js
 // @grant        GM_registerMenuCommand
 // @grant        GM_unregisterMenuCommand
 // @run-at       document-end
